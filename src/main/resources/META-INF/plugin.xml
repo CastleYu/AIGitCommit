@@ -1,7 +1,7 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.hmydk.aigit</id>
-
+    <version>2.1.5</version>
     <name>AI Git Commit</name>
 
     <vendor email="paranoia_zk@yeah.net">HMYDK</vendor>
@@ -16,16 +16,18 @@
 
     <h3>Supported Models:</h3>
     <ul>
-        <li>Support for DeepSeek.</li>
-        <li>Support for Gemini.</li>
+        <li>Support for Gemini 3.1 & 3.0 models.</li>
+        <li>Support for DeepSeek-V3 & DeepSeek-R1.</li>
         <li>Support for SiliconFlow(Model Hub).</li>
         <li>Support for Ollama.</li>
         <li>Support for OpenAI API.</li>
         <li>Support for Cloudflare Workers AI.</li>
         <li>Support for 阿里云百炼(Model Hub).</li>
-        <li>Support for 阿里云百炼(Model Hub).</li>
-        <li>Support for 火山引擎(VolcEngine) by <a href="https://github.com/callMeExiao">Exiao</a></li>
+        <li>Support for 火山引擎(VolcEngine).</li>
+        <li>Support for Kimi (Moonshot AI).</li>
         <li>Support for OpenRouter.</li>
+        <li>Support for OpenAI-compatible LLMs.</li>
+        <li>Automatic system proxy detection.</li>
     </ul>
 
     <h3>Usage:</h3>
@@ -85,7 +87,10 @@
         <![CDATA[
         <h3>Detail:</h3>
         <ul>
-            <li>feat: Add Support for OpenAI-compatible services(<a href="https://github.com/HMYDK/AIGitCommit/pull/80">#80</a>)(by <a href="https://github.com/KaoriEl">@KaoriEl</a>)</li>
+            <li>feat: Support Gemini 3.1 Pro & Flash models</li>
+            <li>feat: Support automatic system proxy detection</li>
+            <li>feat: Update default model to gemini-3.1-flash</li>
+            <li>feat: Support for OpenAI-compatible services</li>
         </ul>
         ]]>
     </change-notes>

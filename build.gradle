@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.hmydk"
-version = "2.1.4"
+version = "2.1.5"
 
 repositories {
     mavenCentral()
@@ -35,7 +35,7 @@ dependencies {
 
 
 runIde {
-    intellij {
-        autoReloadPlugins = true
-    }
+    jvmArgs = ["-Xmx2g", "-XX:+UnlockDiagnosticVMOptions"]
+    systemProperty("idea.is.internal", "true")
+    autoReloadPlugins = true
 }
