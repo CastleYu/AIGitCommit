@@ -33,11 +33,12 @@ public class ApiKeyConfigurableUI {
 
     private JPanel mainPanel;
     private JBTabbedPane tabbedPane;
-    
+
     // 基本设置标签页组件
     private ComboBox<String> clientComboBox;
     private ComboBox<String> moduleComboBox;
     private ComboBox<String> languageComboBox;
+    private JBCheckBox useSystemProxyCheckBox;
     private JButton configButton;
     private JPanel clientPanel;
 
@@ -72,7 +73,7 @@ public class ApiKeyConfigurableUI {
     private void initComponents() {
         // Initialize tabbed pane
         tabbedPane = new JBTabbedPane();
-        
+
         // Initialize basic settings components
         clientPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         clientComboBox = new ComboBox<>(Constants.LLM_CLIENTS);
@@ -88,9 +89,11 @@ public class ApiKeyConfigurableUI {
         languageComboBox.setEditable(true);
         languageComboBox.setSelectedItem("English");
 
+        useSystemProxyCheckBox = new JBCheckBox("Use System Proxy (Default Off)");
+
         // Initialize prompt settings components
         promptTypeComboBox = new ComboBox<>(Constants.getAllPromptTypes());
-        customPromptsTableModel = new DefaultTableModel(new String[]{"Description", "Prompt"}, 0);
+        customPromptsTableModel = new DefaultTableModel(new String[] { "Description", "Prompt" }, 0);
         customPromptsTable = new JBTable(customPromptsTableModel);
 
         // 设置 Description 列的首选宽度和最大宽度
@@ -109,10 +112,10 @@ public class ApiKeyConfigurableUI {
         excludePatternsTextArea.setLineWrap(true);
         excludePatternsTextArea.setWrapStyleWord(true);
         excludePatternsTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        
+
         resetToDefaultButton = new JButton("Reset to Default");
         resetToDefaultButton.setToolTipText("Reset exclusion patterns to default values");
-        
+
         fileExclusionPanel = createFileExclusionPanel();
 
         // Initialize recent prompt components
@@ -122,13 +125,13 @@ public class ApiKeyConfigurableUI {
         recentPromptTextArea.setWrapStyleWord(true);
         recentPromptTextArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         recentPromptTextArea.setBackground(UIManager.getColor("Panel.background"));
-        
+
         copyPromptButton = new JButton("Copy Prompt");
         copyPromptButton.setToolTipText("Copy the recent prompt to clipboard");
-        
+
         refreshPromptButton = new JButton("Refresh");
         refreshPromptButton.setToolTipText("Refresh the recent prompt display");
-        
+
         promptStatusLabel = new JBLabel("No recent prompt available");
         promptStatusLabel.setForeground(JBColor.GRAY);
     }
@@ -136,16 +139,16 @@ public class ApiKeyConfigurableUI {
     private void layoutComponents() {
         // Create main panel
         mainPanel = new JPanel(new BorderLayout());
-        
+
         // Create tabbed pane
         tabbedPane = new JBTabbedPane();
-        
+
         // Add tabs
         tabbedPane.addTab("Basic Settings", createBasicSettingsPanel());
         tabbedPane.addTab("Prompt Settings", createPromptSettingsPanel());
         tabbedPane.addTab("File Filtering", createFileFilterPanel());
         tabbedPane.addTab("Recent Prompt", createRecentPromptPanel());
-        
+
         // Add tabbed pane to main panel
         mainPanel.add(tabbedPane, BorderLayout.CENTER);
     }
@@ -237,7 +240,7 @@ public class ApiKeyConfigurableUI {
                 String description = promptDialogUI.getDescriptionField().getText().trim();
                 String content = promptDialogUI.getContentArea().getText().trim();
                 if (!description.isEmpty() && !content.isEmpty()) {
-                    customPromptsTableModel.addRow(new Object[]{description, content});
+                    customPromptsTableModel.addRow(new Object[] { description, content });
                 }
             }
         });
@@ -248,10 +251,9 @@ public class ApiKeyConfigurableUI {
             int selectedRow = customPromptsTable.getSelectedRow();
             if (selectedRow != -1) {
                 int result = Messages.showYesNoDialog(
-                    "Are you sure you want to delete this custom prompt?",
-                    "Confirm Deletion",
-                    Messages.getQuestionIcon()
-                );
+                        "Are you sure you want to delete this custom prompt?",
+                        "Confirm Deletion",
+                        Messages.getQuestionIcon());
                 if (result == Messages.YES) {
                     customPromptsTableModel.removeRow(selectedRow);
                 }
@@ -265,12 +267,13 @@ public class ApiKeyConfigurableUI {
             String content = (String) customPromptsTableModel.getValueAt(row, 1);
 
             ApplicationManager.getApplication().invokeAndWait(() -> {
-                PromptDialogUIUtil.PromptDialogUI promptDialogUI = PromptDialogUIUtil.showPromptDialog(false, description,
+                PromptDialogUIUtil.PromptDialogUI promptDialogUI = PromptDialogUIUtil.showPromptDialog(false,
+                        description,
                         content);
 
                 UIManager.put("OptionPane.okButtonText", "OK");
                 UIManager.put("OptionPane.cancelButtonText", "Cancel");
-                
+
                 int result = JOptionPane.showConfirmDialog(mainPanel, promptDialogUI.getPanel(), "Update Your Prompt",
                         JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
@@ -292,11 +295,11 @@ public class ApiKeyConfigurableUI {
             updateModuleComboBox(selectedClient);
         });
         configButton.addActionListener(e -> showModuleConfigDialog());
-        
+
         // Recent Prompt tab listeners
         copyPromptButton.addActionListener(e -> copyRecentPromptToClipboard());
         refreshPromptButton.addActionListener(e -> refreshRecentPrompt());
-        
+
         // Load recent prompt when tab is selected
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedIndex() == 3) { // Recent Prompt tab index
@@ -321,7 +324,8 @@ public class ApiKeyConfigurableUI {
             public void mouseClicked(MouseEvent e) {
                 try {
                     Desktop.getDesktop().browse(new URI("https://github.com/HMYDK/AIGitCommit/issues"));
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
         });
         topPanel.add(reportBugLabel, BorderLayout.EAST);
@@ -341,7 +345,7 @@ public class ApiKeyConfigurableUI {
 
         gbc.gridwidth = 2;
         addComponent(panel, topPanel, gbc, 0, 0, 1.0);
-        
+
         // Reset gridwidth for subsequent components
         gbc.gridwidth = 1;
 
@@ -366,18 +370,22 @@ public class ApiKeyConfigurableUI {
         JPanel languagePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         JBLabel languageLabel = new JBLabel("Language: ");
         JBLabel helpIcon = new JBLabel(AllIcons.General.ContextHelp);
-        helpIcon.setToolTipText("The language of the generated commit message. Note that the actual output language depends on the LLM model's language capabilities.");
+        helpIcon.setToolTipText(
+                "The language of the generated commit message. Note that the actual output language depends on the LLM model's language capabilities.");
         languagePanel.add(languageLabel);
         languagePanel.add(helpIcon);
-        
+
         addComponent(panel, languagePanel, gbc, 0, 3, 0.0);
         addComponent(panel, languageComboBox, gbc, 1, 3, 1.0);
+
+        addComponent(panel, new JBLabel("Network: "), gbc, 0, 4, 0.0);
+        addComponent(panel, useSystemProxyCheckBox, gbc, 1, 4, 1.0);
 
         // 添加一个空的面板来填充剩余空间
         gbc.gridwidth = 2;
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        addComponent(panel, new JPanel(), gbc, 0, 4, 1.0);
+        addComponent(panel, new JPanel(), gbc, 0, 5, 1.0);
 
         return panel;
     }
@@ -418,7 +426,8 @@ public class ApiKeyConfigurableUI {
         return createFileExclusionPanel();
     }
 
-    private void addComponent(JPanel parent, Component component, GridBagConstraints gbc, int gridx, int gridy, double weightx) {
+    private void addComponent(JPanel parent, Component component, GridBagConstraints gbc, int gridx, int gridy,
+            double weightx) {
         gbc.gridx = gridx;
         gbc.gridy = gridy;
         gbc.weightx = weightx;
@@ -486,6 +495,10 @@ public class ApiKeyConfigurableUI {
         return clientComboBox;
     }
 
+    public JBCheckBox getUseSystemProxyCheckBox() {
+        return useSystemProxyCheckBox;
+    }
+
     // 文件忽略功能的getter方法
     public JBCheckBox getEnableFileExclusionCheckBox() {
         return enableFileExclusionCheckBox;
@@ -498,9 +511,8 @@ public class ApiKeyConfigurableUI {
     private JPanel createFileExclusionPanel() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(JBUI.Borders.compound(
-            JBUI.Borders.empty(10, 0, 5, 0),
-            JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0)
-        ));
+                JBUI.Borders.empty(10, 0, 5, 0),
+                JBUI.Borders.customLine(JBColor.border(), 1, 0, 0, 0)));
 
         // Title panel
         JPanel titlePanel = new JPanel(new BorderLayout());
@@ -540,7 +552,7 @@ public class ApiKeyConfigurableUI {
             excludePatternsTextArea.setEnabled(enabled);
             resetToDefaultButton.setEnabled(enabled);
         });
-        
+
         resetToDefaultButton.addActionListener(e -> {
             excludePatternsTextArea.setText(Constants.DEFAULT_EXCLUDE_PATTERNS_TEXT);
         });
@@ -554,25 +566,25 @@ public class ApiKeyConfigurableUI {
 
         // Header panel with title and buttons
         JPanel headerPanel = new JPanel(new BorderLayout());
-        
+
         JBLabel titleLabel = new JBLabel("Most Recent AI Prompt");
         titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 14));
         headerPanel.add(titleLabel, BorderLayout.WEST);
-        
+
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         buttonPanel.add(refreshPromptButton);
         buttonPanel.add(copyPromptButton);
         headerPanel.add(buttonPanel, BorderLayout.EAST);
-        
+
         // Status label
         JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 5));
         statusPanel.add(promptStatusLabel);
-        
+
         // Create a combined north panel
         JPanel northPanel = new JPanel(new BorderLayout());
         northPanel.add(headerPanel, BorderLayout.NORTH);
         northPanel.add(statusPanel, BorderLayout.SOUTH);
-        
+
         panel.add(northPanel, BorderLayout.NORTH);
 
         // Text area with scroll pane
@@ -580,10 +592,9 @@ public class ApiKeyConfigurableUI {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setBorder(JBUI.Borders.compound(
-            JBUI.Borders.customLine(JBColor.GRAY, 1),
-            JBUI.Borders.empty(5)
-        ));
-        
+                JBUI.Borders.customLine(JBColor.GRAY, 1),
+                JBUI.Borders.empty(5)));
+
         panel.add(scrollPane, BorderLayout.CENTER);
 
         // Info panel at bottom
@@ -604,7 +615,7 @@ public class ApiKeyConfigurableUI {
             if (recentPrompt != null && !recentPrompt.trim().isEmpty()) {
                 recentPromptTextArea.setText(recentPrompt);
                 promptStatusLabel.setText("Last updated: " + java.time.LocalDateTime.now().format(
-                    java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                        java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
                 promptStatusLabel.setForeground(JBColor.GRAY);
                 copyPromptButton.setEnabled(true);
             } else {
@@ -627,11 +638,11 @@ public class ApiKeyConfigurableUI {
         if (promptText != null && !promptText.trim().isEmpty()) {
             StringSelection selection = new StringSelection(promptText);
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, null);
-            
+
             // Show a brief confirmation
             promptStatusLabel.setText("Prompt copied to clipboard!");
             promptStatusLabel.setForeground(JBColor.GREEN);
-            
+
             // Reset status after 2 seconds
             Timer timer = new Timer(2000, e -> {
                 refreshRecentPrompt(); // This will reset the status label
@@ -644,7 +655,8 @@ public class ApiKeyConfigurableUI {
     private Project getCurrentProject() {
         Project[] openProjects = ProjectManager.getInstance().getOpenProjects();
         if (openProjects.length > 0) {
-            // Return the first open project, or you could implement logic to detect the "current" project
+            // Return the first open project, or you could implement logic to detect the
+            // "current" project
             return openProjects[0];
         }
         return null;
