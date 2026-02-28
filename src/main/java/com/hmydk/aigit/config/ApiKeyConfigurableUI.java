@@ -11,14 +11,11 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.util.net.HttpProxyConfigurable;
 import com.intellij.ui.JBColor;
 import com.intellij.ui.ToolbarDecorator;
-import com.intellij.ui.components.JBLabel;
 import com.intellij.ui.table.JBTable;
-import com.intellij.ui.components.JBCheckBox;
-import com.intellij.ui.components.JBTextArea;
-import com.intellij.ui.components.JBScrollPane;
-import com.intellij.ui.components.JBTabbedPane;
+import com.intellij.ui.components.*;
 import com.intellij.util.ui.JBUI;
 
 import javax.swing.*;
@@ -93,7 +90,7 @@ public class ApiKeyConfigurableUI {
 
         // Initialize prompt settings components
         promptTypeComboBox = new ComboBox<>(Constants.getAllPromptTypes());
-        customPromptsTableModel = new DefaultTableModel(new String[] { "Description", "Prompt" }, 0);
+        customPromptsTableModel = new DefaultTableModel(new String[]{"Description", "Prompt"}, 0);
         customPromptsTable = new JBTable(customPromptsTableModel);
 
         // 设置 Description 列的首选宽度和最大宽度
@@ -240,7 +237,7 @@ public class ApiKeyConfigurableUI {
                 String description = promptDialogUI.getDescriptionField().getText().trim();
                 String content = promptDialogUI.getContentArea().getText().trim();
                 if (!description.isEmpty() && !content.isEmpty()) {
-                    customPromptsTableModel.addRow(new Object[] { description, content });
+                    customPromptsTableModel.addRow(new Object[]{description, content});
                 }
             }
         });
@@ -331,18 +328,13 @@ public class ApiKeyConfigurableUI {
         topPanel.add(reportBugLabel, BorderLayout.EAST);
 
         // Add proxy settings link
-        JLabel proxySettingsLabel = new JLabel(
-                "<html><a href='#'>Manage HTTP proxy settings (requires restart)</a></html>");
-        proxySettingsLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        proxySettingsLabel.setForeground(JBColor.GRAY);
-        proxySettingsLabel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(null, "HTTP Proxy");
-            }
+        // 使用 ActionLink 替代 JLabel
+        ActionLink proxySettingsLink = new ActionLink("Manage HTTP proxy settings (requires restart)", e -> {
+            // 触发点击后的动作
+            ShowSettingsUtil.getInstance().showSettingsDialog(null, HttpProxyConfigurable.class);
         });
-        topPanel.add(proxySettingsLabel, BorderLayout.WEST);
 
+        topPanel.add(proxySettingsLink, BorderLayout.WEST);
         gbc.gridwidth = 2;
         addComponent(panel, topPanel, gbc, 0, 0, 1.0);
 
@@ -427,7 +419,7 @@ public class ApiKeyConfigurableUI {
     }
 
     private void addComponent(JPanel parent, Component component, GridBagConstraints gbc, int gridx, int gridy,
-            double weightx) {
+                              double weightx) {
         gbc.gridx = gridx;
         gbc.gridy = gridy;
         gbc.weightx = weightx;
