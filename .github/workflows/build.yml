@@ -9,6 +9,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
     - uses: actions/checkout@v4
@@ -30,3 +32,37 @@ jobs:
       with:
         name: AIGitCommit-plugin
         path: build/distributions/*.zip
+
+    - name: Get version
+      id: get_version
+      run: |
+        # Use sed to extract version from build.gradle
+        VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' build.gradle)
+        if [ -z "$VERSION" ]; then
+          # Try single quotes if double quotes not found
+          VERSION=$(sed -n "s/^version = '\(.*\)'/\1/p" build.gradle)
+        fi
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+    - name: Create and Push Tag
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      run: |
+        TAG="v${{ steps.get_version.outputs.version }}"
+        if git rev-parse "$TAG" >/dev/null 2>&1; then
+          echo "Tag $TAG already exists. Skipping tag creation."
+        else
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$TAG"
+          git push origin "$TAG"
+        fi
+
+    - name: Create Release
+      if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: v${{ steps.get_version.outputs.version }}
+        files: build/distributions/*.zip
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
