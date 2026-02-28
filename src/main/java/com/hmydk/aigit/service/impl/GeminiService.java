@@ -136,7 +136,7 @@ public class GeminiService implements AIService {
         String jsonInputString = objectMapper1.writeValueAsString(geminiRequestBO);
 
         URI uri = URI.create(apiUrl);
-        Proxy proxy = ProxySelector.getDefault().select(uri).get(0);
+        Proxy proxy = ProxySelector.getDefault().select(uri).stream().findFirst().orElse(Proxy.NO_PROXY);
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(proxy);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
@@ -164,7 +164,7 @@ public class GeminiService implements AIService {
         String jsonInputString = objectMapper1.writeValueAsString(geminiRequestBO);
 
         URI uri = URI.create(apiUrl);
-        Proxy proxy = ProxySelector.getDefault().select(uri).get(0);
+        Proxy proxy = ProxySelector.getDefault().select(uri).stream().findFirst().orElse(Proxy.NO_PROXY);
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(proxy);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");

@@ -50,7 +50,7 @@ public class OpenAIUtil {
         String jsonInputString = objectMapper1.writeValueAsString(openAIRequestBO);
 
         URI uri = URI.create(url);
-        Proxy proxy = ProxySelector.getDefault().select(uri).get(0);
+        Proxy proxy = ProxySelector.getDefault().select(uri).stream().findFirst().orElse(Proxy.NO_PROXY);
         HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(proxy);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
