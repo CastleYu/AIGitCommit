@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.Proxy;
+import java.net.ProxySelector;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -134,7 +136,8 @@ public class GeminiService implements AIService {
         String jsonInputString = objectMapper1.writeValueAsString(geminiRequestBO);
 
         URI uri = URI.create(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        Proxy proxy = ProxySelector.getDefault().select(uri).get(0);
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(proxy);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setDoOutput(true);
@@ -161,7 +164,8 @@ public class GeminiService implements AIService {
         String jsonInputString = objectMapper1.writeValueAsString(geminiRequestBO);
 
         URI uri = URI.create(apiUrl);
-        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection();
+        Proxy proxy = ProxySelector.getDefault().select(uri).get(0);
+        HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(proxy);
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json");
         connection.setRequestProperty("Accept-Charset", "UTF-8");
